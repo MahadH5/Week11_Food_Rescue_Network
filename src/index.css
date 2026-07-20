@@ -1,0 +1,616 @@
+/* ==========================================================================
+   Food Rescue Network — stylesheet
+   --------------------------------------------------------------------------
+   This file is given to you complete. You do not need to change it, but it
+   is worth reading: every class name your components use is defined here.
+   Think of it as the "contract" between the CSS and your JSX — if you spell
+   a class name differently in a component, the styling simply won't apply.
+
+   Sections:
+     1.  Design tokens (:root custom properties)
+     2.  Base / reset
+     3.  Page layout      .board, .board-header, .board-stats, .board-grid
+     4.  Listing card     .listing-card and its media + body
+     5.  Badges           .badge and its variants
+     6.  Details button   .details-button
+     7.  Details panel    .listing-details, .detail-row, allergens
+     8.  Animations       entrance + stagger
+     9.  Responsive       small screens
+     10. Accessibility    reduced motion
+   ========================================================================== */
+
+/* ==========================================================================
+   1. DESIGN TOKENS
+   Every colour in this file comes from one of these variables. Change a
+   value here and it updates everywhere — that is the whole point.
+   ========================================================================== */
+
+:root {
+  /* Surfaces — deep charcoal-green, warm rather than blue */
+  --bg: #0c1210;        /* page background */
+  --surface: #131c19;   /* card surface */
+  --surface-2: #0f1714; /* nested panels inside a card */
+  --edge: #24352e;      /* borders */
+
+  /* Text — three levels of emphasis */
+  --ink: #f2f7f4;   /* headings */
+  --body: #b7c7bf;  /* body text */
+  --muted: #7f938b; /* captions and labels */
+
+  /* Accents */
+  --leaf: #34d399;      /* primary: fresh green */
+  --leaf-soft: #6ee7b7; /* lighter green for hover/highlight */
+  --amber: #fbbf24;     /* warning: closing soon */
+  --amber-soft: #fcd34d;
+  --plum: #a78bfa;      /* featured listings */
+
+  /* Motion */
+  --t-fast: 0.15s ease;
+  --t-med: 0.28s ease;
+
+  /* Shape */
+  --radius-card: 18px;
+  --radius-pill: 999px;
+}
+
+/* ==========================================================================
+   2. BASE / RESET
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--body);
+  -webkit-font-smoothing: antialiased;
+
+  /* Two soft glows sit on top of the flat background colour: a green one
+     bleeding in from the top-left, an amber one from the top-right. */
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(
+      780px 520px at 12% -8%,
+      rgba(52, 211, 153, 0.16),
+      transparent 62%
+    ),
+    radial-gradient(
+      680px 460px at 92% -4%,
+      rgba(251, 191, 36, 0.11),
+      transparent 60%
+    );
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+/* ==========================================================================
+   3. PAGE LAYOUT
+   ========================================================================== */
+
+.board {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 48px 24px 72px;
+}
+
+/* --- Header ------------------------------------------------------------- */
+
+.board-header {
+  margin-bottom: 40px;
+}
+
+.board-eyebrow {
+  display: inline-block;
+  margin: 0 0 12px;
+  padding: 6px 14px;
+  border: 1px solid rgba(52, 211, 153, 0.34);
+  border-radius: var(--radius-pill);
+  background: rgba(52, 211, 153, 0.1);
+  color: var(--leaf-soft);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.board-title {
+  margin: 0 0 12px;
+  /* clamp() lets the title shrink on phones without a media query */
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.board-subtitle {
+  margin: 0;
+  max-width: 62ch;
+  font-size: 1.0625rem;
+  color: var(--body);
+}
+
+/* --- Stat strip --------------------------------------------------------- */
+
+.board-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 28px;
+}
+
+.stat {
+  flex: 1 1 150px;
+  padding: 16px 20px;
+  border: 1px solid var(--edge);
+  border-radius: 14px;
+  background: linear-gradient(160deg, var(--surface), var(--surface-2));
+}
+
+.stat-value {
+  display: block;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--leaf);
+}
+
+.stat-label {
+  display: block;
+  margin-top: 4px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+/* --- Grid --------------------------------------------------------------- */
+
+/* auto-fill + minmax means the browser decides the column count: as many
+   320px-or-wider columns as fit, each sharing leftover space equally.
+   min(320px, 100%) keeps the floor from overflowing the page on very narrow
+   screens: below ~352px the track collapses to the container width instead of
+   forcing a 320px column and a horizontal scrollbar. */
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(320px, 100%), 1fr));
+  gap: 22px;
+}
+
+/* --- Footer / empty state ----------------------------------------------- */
+
+.board-footer {
+  margin-top: 48px;
+  padding-top: 24px;
+  border-top: 1px solid var(--edge);
+  font-size: 0.9375rem;
+  color: var(--muted);
+  text-align: center;
+}
+
+.board-empty {
+  grid-column: 1 / -1;
+  padding: 56px 24px;
+  border: 1px dashed var(--edge);
+  border-radius: var(--radius-card);
+  background: var(--surface-2);
+  text-align: center;
+  font-size: 1.0625rem;
+  color: var(--muted);
+}
+
+/* ==========================================================================
+   4. LISTING CARD
+   ========================================================================== */
+
+.listing-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--edge);
+  border-radius: var(--radius-card);
+  background: linear-gradient(165deg, var(--surface) 0%, var(--surface-2) 100%);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.42);
+  transition:
+    transform var(--t-med),
+    box-shadow var(--t-med),
+    border-color var(--t-med);
+}
+
+.listing-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(52, 211, 153, 0.45);
+  box-shadow: 0 26px 52px rgba(0, 0, 0, 0.55);
+}
+
+/* --- State variants -----------------------------------------------------
+   IMPORTANT: a card can be BOTH closing soon and featured. Three rules make
+   that work:
+     - --closing owns the amber BORDER and an amber glow (urgency wins; a
+       collector needs to see the deadline first).
+     - --featured adds a plum ribbon along the TOP EDGE via ::before, its own
+       plum glow, and — only when --closing is absent — a plum border.
+     - the combined selector below spells out BOTH glows in one declaration.
+   That third rule is not optional. box-shadow is a single property, so it
+   does not accumulate across rules: two rules of equal specificity means the
+   later one wins outright and the earlier shadow disappears. Layering only
+   happens inside one comma-separated list.
+   -------------------------------------------------------------------- */
+
+.listing-card--closing {
+  border-color: rgba(251, 191, 36, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(251, 191, 36, 0.2),
+    0 18px 40px rgba(251, 191, 36, 0.14),
+    0 18px 38px rgba(0, 0, 0, 0.45);
+}
+
+.listing-card--closing:hover {
+  border-color: rgba(251, 191, 36, 0.8);
+}
+
+.listing-card--featured {
+  position: relative;
+  box-shadow:
+    0 18px 40px rgba(167, 139, 250, 0.16),
+    0 18px 38px rgba(0, 0, 0, 0.45);
+}
+
+/* The plum ribbon. Sits above the image band, so it reads on any card. */
+.listing-card--featured::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--plum), #c4b5fd);
+  z-index: 2;
+}
+
+/* Featured-only cards get a plum border. The :not() guard is what lets the
+   amber border survive on a card that is closing soon as well as featured. */
+.listing-card--featured:not(.listing-card--closing) {
+  border-color: rgba(167, 139, 250, 0.5);
+}
+
+.listing-card--featured:not(.listing-card--closing):hover {
+  border-color: rgba(167, 139, 250, 0.8);
+}
+
+/* Both at once (listing 3). Higher specificity than either single-class rule,
+   so this is the box-shadow that lands — and it lists the amber urgency ring,
+   the amber glow and the plum glow together. */
+.listing-card--closing.listing-card--featured {
+  box-shadow:
+    0 0 0 1px rgba(251, 191, 36, 0.2),
+    0 18px 40px rgba(251, 191, 36, 0.14),
+    0 18px 40px rgba(167, 139, 250, 0.16),
+    0 18px 38px rgba(0, 0, 0, 0.45);
+}
+
+/* --- Media band --------------------------------------------------------- */
+
+.listing-media {
+  position: relative;
+  height: 168px;
+  overflow: hidden;
+  background: var(--surface-2);
+  flex-shrink: 0;
+}
+
+.listing-media img {
+  width: 100%;
+  height: 100%;
+  /* cover = fill the band, crop the overflow, never squash the artwork */
+  object-fit: cover;
+  transition: transform 0.45s ease;
+}
+
+/* Gentle zoom when the whole card is hovered */
+.listing-card:hover .listing-media img {
+  transform: scale(1.06);
+}
+
+/* Small floating label over the image (e.g. portions) */
+.listing-media-tag {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 5px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-pill);
+  background: rgba(12, 18, 16, 0.82);
+  backdrop-filter: blur(6px);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* --- Card body ---------------------------------------------------------- */
+
+.listing-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1; /* pushes the button to the bottom on short cards */
+  padding: 20px;
+}
+
+.listing-title {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.3;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.listing-provider {
+  margin: -6px 0 0;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--leaf-soft);
+}
+
+.listing-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.listing-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* ==========================================================================
+   5. BADGES
+   ========================================================================== */
+
+.badge-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 12px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.badge--category {
+  border-color: rgba(52, 211, 153, 0.3);
+  background: rgba(52, 211, 153, 0.14);
+  color: var(--leaf-soft);
+}
+
+.badge--available {
+  border-color: rgba(52, 211, 153, 0.34);
+  background: transparent;
+  color: var(--leaf);
+}
+
+/* Solid amber with dark text — highest contrast badge, used for urgency. */
+.badge--closing {
+  background: linear-gradient(135deg, var(--amber), var(--amber-soft));
+  color: #2b1d00;
+}
+
+/* Dark ink on the plum gradient, same treatment as --closing above. White
+   text here would sit at 2.7:1 against the plum and 1.9:1 against the light
+   end — well under the 4.5:1 WCAG AA minimum. #1e1033 clears it at both. */
+.badge--featured {
+  background: linear-gradient(135deg, var(--plum), #c4b5fd);
+  color: #1e1033;
+}
+
+/* ==========================================================================
+   6. DETAILS BUTTON
+   ========================================================================== */
+
+.details-button {
+  width: 100%;
+  min-height: 44px; /* comfortable touch target */
+  margin-top: auto;
+  padding: 11px 18px;
+  border: 1px solid rgba(52, 211, 153, 0.4);
+  border-radius: 11px;
+  background: transparent;
+  color: var(--leaf-soft);
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background var(--t-fast),
+    border-color var(--t-fast),
+    color var(--t-fast);
+}
+
+.details-button:hover {
+  background: rgba(52, 211, 153, 0.14);
+  border-color: var(--leaf);
+  color: var(--ink);
+}
+
+.details-button:focus-visible {
+  outline: 3px solid var(--leaf);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   7. DETAILS PANEL
+   ========================================================================== */
+
+.listing-details {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  border-left: 3px solid var(--leaf);
+  border-radius: 0 12px 12px 0;
+  background: var(--surface-2);
+  animation: detail-slide 0.28s ease both;
+}
+
+.detail-row {
+  display: grid;
+  grid-template-columns: 116px 1fr;
+  gap: 4px 14px;
+  align-items: start;
+}
+
+.detail-label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.detail-value {
+  font-size: 0.9375rem;
+  color: var(--body);
+}
+
+/* --- Allergens ---------------------------------------------------------- */
+
+.allergen-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.allergen-chip {
+  padding: 3px 10px;
+  border: 1px solid rgba(251, 191, 36, 0.32);
+  border-radius: var(--radius-pill);
+  background: rgba(251, 191, 36, 0.12);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--amber-soft);
+}
+
+.allergen-none {
+  font-size: 0.875rem;
+  font-style: italic;
+  color: var(--muted);
+}
+
+/* ==========================================================================
+   8. ANIMATIONS
+   ========================================================================== */
+
+@keyframes detail-slide {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Cards fade up as the board loads. The :nth-child delays stagger the first
+   eight cards so they arrive in a wave rather than all at once. */
+.listing-card {
+  animation: card-rise 0.42s ease both;
+}
+
+.listing-card:nth-child(1) { animation-delay: 0.03s; }
+.listing-card:nth-child(2) { animation-delay: 0.09s; }
+.listing-card:nth-child(3) { animation-delay: 0.15s; }
+.listing-card:nth-child(4) { animation-delay: 0.21s; }
+.listing-card:nth-child(5) { animation-delay: 0.27s; }
+.listing-card:nth-child(6) { animation-delay: 0.33s; }
+.listing-card:nth-child(7) { animation-delay: 0.39s; }
+.listing-card:nth-child(8) { animation-delay: 0.45s; }
+
+/* ==========================================================================
+   9. RESPONSIVE
+   ========================================================================== */
+
+/* Stack the label above the value when the card gets narrow. */
+@media (max-width: 380px) {
+  .detail-row {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .board {
+    padding: 32px 16px 52px;
+  }
+
+  .listing-body {
+    padding: 16px;
+  }
+
+  .stat {
+    padding: 14px 16px;
+  }
+
+  .listing-media {
+    height: 148px;
+  }
+}
+
+/* ==========================================================================
+   10. ACCESSIBILITY — reduced motion
+   Some people get motion sick from movement on screen. When their OS asks
+   for reduced motion we remove animation, transitions and the hover lift.
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    /* The delay has to go too. Without this the staggered card-rise delays
+       still run, and because the animation uses fill-mode `both` the card
+       sits at opacity 0 for up to 450ms before snapping in. */
+    animation-delay: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .listing-card:hover {
+    transform: none;
+  }
+
+  .listing-card:hover .listing-media img {
+    transform: none;
+  }
+}
