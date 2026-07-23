@@ -1,5 +1,9 @@
+
 import { useState } from "react";
 import { foodListings, isListingClosingSoon } from "./data/foodListings.js";
+
+
+import FoodListingList from "./components/FoodListingList.jsx";
 
 /*
  * App.jsx — header, stats and footer are done.
@@ -12,6 +16,8 @@ import { foodListings, isListingClosingSoon } from "./data/foodListings.js";
  */
 function App() {
   const [listings] = useState(foodListings);
+  
+  
 
   const totalPortions = listings.reduce(
     (runningTotal, listing) => runningTotal + listing.portions,
@@ -27,11 +33,14 @@ function App() {
         <h1 className="board-title">Food Rescue Network</h1>
 
         <p className="board-subtitle">
-          Good food gets thrown away every day while neighbours go without.
+          Good food gets thrown away every day while neighbors go without.
           Bakeries, grocers, caterers and restaurants post their surplus here;
           volunteer collectors pick it up and get it to people who need it —
           before the pickup window closes.
         </p>
+       
+      
+
 
         <div className="board-stats">
           <div className="stat">
@@ -50,17 +59,20 @@ function App() {
       </header>
 
       <div className="board-empty">
-        The board is empty. Build your components in{" "}
-        <strong>src/components/</strong>, then render the list here — see the
-        notes at the top of this file.
+      <FoodListingList listings={listings} />
       </div>
+
+      
+      
 
       <footer className="board-footer">
         Food Rescue Network is a classroom prototype. All providers, pickup
         locations and listings on this board are fictional — please do not
         turn up anywhere expecting soup.
       </footer>
+
     </div>
+    
   );
 }
 

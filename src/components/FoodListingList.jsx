@@ -1,3 +1,7 @@
+import FoodListingCard from "./FoodListingCard";
+
+
+
 /*
  * FoodListingList — App hands it the whole array; it renders one card
  * per listing inside the .board-grid below.
@@ -8,12 +12,16 @@
  *
  * Replace the placeholder box. Write this after the card.
  */
-function FoodListingList() {
+
+
+function FoodListingList(props) {
   return (
     <div className="board-grid">
-      <div className="board-empty">
-        FoodListingList is still showing its placeholder.
-      </div>
+      {/* <div className="board-empty"> */}
+        {props.listings.map((food) =>(
+          <FoodListingCard list={food}/>
+        ))}
+      {/* </div> */}
     </div>
   );
 }
