@@ -5,6 +5,7 @@ import { useState } from "react";
 
 
 function FoodListingCard({list}) {
+  
   const isClosingSoon = false;
   const isFeatured = false;
 
@@ -33,6 +34,7 @@ function FoodListingCard({list}) {
         <div className="badge-row">
           <span className="badge badge--category">{list.category}</span>
           <span className="badge badge--available">{list.status}</span>
+          
 
           {isClosingSoon && (
             <span className="badge badge--closing">Closing Soon</span>
@@ -45,11 +47,11 @@ function FoodListingCard({list}) {
         <div className="listing-meta">
           <span className="listing-meta-item">
             <span aria-hidden="true">📍</span>
-            {list.featured}
+            {list.pickupNeighborhood}
           </span>
           <span className="listing-meta-item">
             <span aria-hidden="true">🍽️</span>
-            Feeds about {list.category}
+            Feeds about {list.portions}
           </span>
         </div>
 
@@ -65,7 +67,7 @@ function FoodListingCard({list}) {
         <div className="listing-details">
           <div className="detail-row">
             <span className="detail-label">About</span>
-            <span className="detail-value">{list.title}</span>
+            <span className="detail-value">{list.description}</span>
           </div>
 
           <div className="detail-row">
