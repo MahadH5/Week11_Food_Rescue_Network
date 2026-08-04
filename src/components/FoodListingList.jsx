@@ -1,27 +1,19 @@
-import FoodListingCard from "./FoodListingCard";
+import FoodListingCard from "./FoodListingCard.jsx";
 
+function FoodListingList({ listings, onDelete }) {
+  if (listings.length === 0) {
+    return (
+      <div className="board-grid">
+        <p className="board-empty">No listings yet. Post the first one above.</p>
+      </div>
+    );
+  }
 
-
-/*
- * FoodListingList — App hands it the whole array; it renders one card
- * per listing inside the .board-grid below.
- *
- * You need the card component in here, each card needs its own listing,
- * and React needs a stable way to tell the cards apart (the array
- * position is not it).
- *
- * Replace the placeholder box. Write this after the card.
- */
-
-
-function FoodListingList(props) {
   return (
     <div className="board-grid">
-      {/* <div className="board-empty"> */}
-        {props.listings.map((food) =>(
-          <FoodListingCard list={food}/>
-        ))}
-      {/* </div> */}
+      {listings.map((listing) => (
+        <FoodListingCard key={listing.id} listing={listing} onDelete={onDelete} />
+      ))}
     </div>
   );
 }
